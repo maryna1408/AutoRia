@@ -1,4 +1,36 @@
+.text-center{
+    background-color: orange;
+    height: 200px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: aliceblue;
+    font-size: 60px;
+}
 .card-img{
     height: 200px;
     object-fit: cover;
+}
+h6{
+    font-size: 30px;
+    color: green;
+}
+.card-vin{
+    font-size: 18px;
+}
+
+.vin-span{
+    color: blue;
+    font-size: 20px;
+    font-weight: bold;
+}
+.call-button{
+    background-color: #3FA1FF;
+    border: none;
+    border-radius: 10%;
+    padding: 5px 10px;
+    color: white;
+}
+.top-bar{
+    height: 100px;
 }
