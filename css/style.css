@@ -1,36 +1,38 @@
 .text-center{
-    background-color: orange;
     height: 200px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: aliceblue;
     font-size: 60px;
 }
 .card-img{
     height: 200px;
     object-fit: cover;
 }
-h6{
-    font-size: 30px;
+
+
+ol, ul {
+	list-style: none;
+}
+/* body *{
+font-size: 18px;
+} */
+.card-title{
+    transition: .2s;
+}
+.card-title:hover{
     color: green;
 }
-.card-vin{
-    font-size: 18px;
+.parameters{
+    columns: 2;
 }
-
-.vin-span{
-    color: blue;
-    font-size: 20px;
-    font-weight: bold;
+.content-article{
+    columns: 3;
 }
-.call-button{
-    background-color: #3FA1FF;
-    border: none;
-    border-radius: 10%;
-    padding: 5px 10px;
-    color: white;
+.card-list.row-cols-2 .card-img-wrap,
+.card-list.row-cols-2 .card-body-wrap{
+    width: 100%;
 }
-.top-bar{
-    height: 100px;
+.card-list.row-cols-2{
+    justify-content: space-between;
+}
+.card-list.row-cols-2>.card{
+    width: 49%;
 }

@@ -10,15 +10,48 @@
       integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1"
       crossorigin="anonymous"
     />
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.2/css/all.css" integrity="sha384-vSIIfh2YWi9wW0r9iZe7RJPrKwp6bG+s9QZMoITbCckVJqGCCRhc+ccxNcdpHuYu" crossorigin="anonymous">
+    <link
+      rel="stylesheet"
+      href="https://use.fontawesome.com/releases/v5.15.2/css/all.css"
+      integrity="sha384-vSIIfh2YWi9wW0r9iZe7RJPrKwp6bG+s9QZMoITbCckVJqGCCRhc+ccxNcdpHuYu"
+      crossorigin="anonymous"
+    />
     <link rel="stylesheet" href="css/style.css" />
     <title>JS project</title>
   </head>
   <body>
     <div class="container">
-      <h1 class="text-center">Cars list</h1>
+      <!-- <button class="btn btn-success" id="testBtn">Test btn!</button> -->
+      <h1 class="text-center d-flex justify-content-center align-items-center bg-warning text-light">Cars list</h1>
       <div class="row">
-        <div class="col-12 top-bar"></div>
+        <div class="col-12 top-bar d-flex my-3">
+          <select class="form-select" aria-label="Default select example" id="sortSelect">
+            <option selected disabled>Sort by...</option>
+            <option value="price-ba">По цене (от дорогих к дешевым)</option>
+            <option value="price-ab">По цене (от дешевых к дорогим)</option>
+            <option value="year-ba">По году (от новых к старым)</option>
+            <option value="year-ab">По году (от старых к новым)</option>
+            <option value="rating-ba">По рейтингу (по убыванию)</option>
+            <option value="rating-ab">По рейтингу (по возрастанию)</option>
+            <option value="odo-ba">По пробегу (по убыванию)</option>
+            <option value="odo-ab">По пробегу (по возрастанию)</option>
+            <option value="make-ab">По производителю (A-Я)</option>
+            <option value="make-ba">По производителю (Я-А)</option>
+          </select>
+          <div class="col-6">
+            <form name="form-search">
+              <input type="searchForm" placeholder="Search" name="search-form" />
+            </form>
+          </div>
+          <div class="top-bar-buttons d-flex justify-content-between" id="masonryBtns">
+            <button data-action="1" class="btn btn-success me-2">
+              <i class="fas fa-bars"></i>
+            </button>
+            <button data-action="2" class="btn btn-secondary">
+              <i class="fab fa-microsoft"></i>
+            </button>
+          </div>
+        </div>
         <div class="col-3 filter-bar">Filters</div>
         <div class="col-9 content">
           <div class="row row-cols-1 g-0 card-list" id="cardList">

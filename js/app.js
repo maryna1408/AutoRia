@@ -1,6 +1,9 @@
+'use strict'
+
 let CARS = JSON.parse(DATA)
 const cardListEl = document.getElementById('cardList')
-
+const masonryBtnsEl = document.getElementById('masonryBtns')
+const sortSelectEl = document.getElementById('sortSelect')
 // {
 //     "id": "89aed5b8c686ebd713a62873e4cd756abab7a106",
 //     "make": "BMW",
@@ -24,49 +27,119 @@ const cardListEl = document.getElementById('cardList')
 //     "odo": 394036,
 //     "consume": { "road": 4.8, "city": 12.3, "mixed": 8.4 }
 //   },
+sortSelectEl.addEventListener('change', event => { 
+  console.log(event.target.value.split());
+  // let type = event.target.value.split('-')[1]
+  // let key = event.target.value.split('-')[0]
+  let [key, type] = event.target.value.split('-')
+
+  CARS.sort((a,b) => {
+    if (type == 'ab') {
+      if (key != string) {
+        return a[key] - b[key]
+      } else if (key == string) {
+        return (a[key]).localeCompare(b[key])
+      }
+    } else if (type == 'ba') {
+      if (key != string) {
+        return b[key] - a[key]
+      } else if (key == string) {
+        return (b[key]).localeCompare(a[key])
+      }
+    }
+  })
+  
+  renderCards(CARS, cardListEl)
+})
+
+
+
+masonryBtnsEl.addEventListener('click', event => {
+  const btnEl = event.target.closest('.btn')
+  if (btnEl) {
+    console.log(btnEl.dataset.action);
+    if (btnEl.dataset.action == '1') {
+      cardListEl.classList.add('row-cols-1')
+      cardListEl.classList.remove('row-cols-2')
+    } else if (btnEl.dataset.action == '2') {
+      cardListEl.classList.add('row-cols-2')
+      cardListEl.classList.remove('row-cols-1')
+    }
+
+    btnEl.classList.add('btn-success')
+    btnEl.classList.remove('btn-secondary')
+    const siblings = findSiblings(btnEl)
+    siblings.forEach(sibling => {
+      sibling.classList.add('btn-secondary')
+      sibling.classList.remove('btn-success')
+    })
+  }
+})
+
+
 renderCards(CARS, cardListEl)
 
 
 function renderCards(data_array, node) {
   let html = ''
-
-  //    for (let i = 0; i < data_array.length; i++) {
-  //        const element = data_array[i];
-  //        html += createCardHTML(element)
-  //    }
   data_array.forEach(el => html += createCardHTML(el));
-
   node.innerHTML = html
 }
 
 
 function createCardHTML(card_data) {
-  return `<div class="col card mb-3">
+  let starIcons = ''
+  for (let i = 0; i < 5; i++) {
+    if (card_data.rating > i) {
+      starIcons += '<i class="fas fa-star"></i>'
+    } else {
+      starIcons += '<i class="far fa-star"></i>'
+    }
+  }
+  let vinCheck = ''
+  if (card_data.vin_check == true) {
+    vinCheck = '<i class="fas fa-check text-success fs-4 px-2"></i>'
+  } else {
+    vinCheck = '<i class="fas fa-times text-danger fs-4 px-2"></i>'
+  }
+  let top = ''
+  if (card_data.top == true) {
+    
+  } else if (card_data.top == false){
+
+  }
+
+  return `<div class="col card mb-3 ">
     <div class="row g-0">
-      <div class="col-4">
+      <div class="col-4 card-img-wrap position-relative">
         <img class="card-img" width="1" height="1" loading="lazy" src="${card_data.img}" alt="${card_data.make} ${card_data.model}" />
+        <h6 class="text-warning my-4 d-flex justify-content-center fs-4">${starIcons}</h6>
       </div>
-      <div class="col-8">
-        <div class="card-body">
-          <h5 class="card-title">${card_data.make} ${card_data.model} ${card_data.engine_volume} ${card_data.transmission} (${card_data.year})</h5>
-          <h6 class="card-price">${card_data.price}$</h6>
-          <div class="col-8 parameters">
-          <span class="span-parameters"><i class="fas fa-tachometer-alt"></i> ${card_data.odo} km</span>
-          <span class="span-parameters"><i class="fas fa-map-marker-alt"></i> ${card_data.country}</span>
-          <span class="span-parameters"><i class="fas fa-gas-pump"></i> ${card_data.fuel}, ${card_data.engine_volume}</span>
-          <span class="span-parameters">${card_data.transmission}</span>
-          </div>
-          <article class="content-article"> Fuel Consumption (l/1000km)
-          <section><i class="fas fa-city"></i> ${card_data.consume.city}</section>
-          <section><i class="fas fa-road"></i> ${card_data.consume.road}</section>
-          <section><i class="fas fa-sync"></i> ${card_data.consume.mixed}</section>
-          </article>
-          <p class="card-vin"><span class="vin-span">VIN:</span> ${card_data.vin || "none"}</p>
+      <div class="col-8 card-body-wrap">
+        <div class="card-body position-relative">
+          <h5 class="card-title fs-3 fw-bold">${card_data.make} ${card_data.model} ${card_data.engine_volume} ${card_data.transmission} (${card_data.year})</h5>
+          <h6 class="card-price fs-3 fw-bold text-success">${card_data.price}$</h6>
+          
+          <ul class="col-8 parameters px-2">
+          <li class="span-parameters py-2"><i class="fas fa-tachometer-alt text-warning"></i> ${card_data.odo} km</li>
+          <li class="span-parameters py-2"><i class="fas fa-map-marker-alt text-warning"></i> ${card_data.country}</li>
+          <li class="span-parameters py-2"><i class="fas fa-gas-pump text-warning"></i> ${card_data.fuel}, ${card_data.engine_volume}</li>
+          <li class="span-parameters py-2"><i class="fas fa-cogs text-warning"></i> ${card_data.transmission}</li>
+          </ul>
+          <p class="fs-6 fw-bold">Fuel Consumption (l/1000km)</p>
+          <ul class="content-article w-75"> 
+          <li><i class="fas fa-city text-warning"></i> ${card_data.consume?.city}</li>
+          <li><i class="fas fa-road text-warning"></i> ${card_data.consume?.road}</li>
+          <li><i class="fas fa-sync text-warning"></i> ${card_data.consume?.mixed}</li>
+          </ul>
+          ${card_data.vin ? `<p class="card-vin "><span class="vin-span fw-bold text-primary fs-5">VIN:</span> ${card_data.vin}${vinCheck}</p>` : '<div class="bg-warning d-flex justify-content-center fs-5  p-1 my-4">This car hasnt a VIN number!!!!!</div>'}
           <p>Color: ${card_data.color}</p>
-          <div class="call">
-          <button class="call-button"><i class="fas fa-phone-alt"></i> Call</button>
+          <div class="call d-flex align-items-center">
+          <a href="tel:${card_data.phone}" class="btn btn-info cart-btn  text-light"><i class="fas fa-phone-alt"></i> Cart</a>
+          <a href="tel:${card_data.phone}" class="btn btn-primary call-btn mx-4"><i class="fas fa-phone-alt"></i> Call</a>
           <p><i class="far fa-user"></i> ${card_data.seller}</p>
           </div>
+          <button class="position-absolute top-0 end-0 btn btn-secondary m-3"><i class="fas fa-star"></i></button>
         </div>
       </div>
       <div class="col-12 card-footer text-muted">
@@ -77,10 +150,32 @@ function createCardHTML(card_data) {
   </div>`
 }
 
-// function sum(a, b) {
-//     return a + b
-// }
 
-// let result = 0
 
-// result = sum(10, 5)
+
+// Utils functions
+
+function findSiblings(element) {
+  const parent = element.parentElement
+  const children = [...parent.children]
+  const siblings = children.filter(child => child != element)
+  return siblings
+
+  // return [...element.parentElement.children].filter(child => child != element)
+}
+
+
+
+
+
+
+
+
+
+
+// let a = [5,6,9,1,2,10,4,7,13,8,11]
+
+// a.sort((a,b) => {
+//   return a - b
+// })
+// console.log(a);
