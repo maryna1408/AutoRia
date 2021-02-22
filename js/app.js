@@ -4,6 +4,9 @@ let CARS = JSON.parse(DATA)
 const cardListEl = document.getElementById('cardList')
 const masonryBtnsEl = document.getElementById('masonryBtns')
 const sortSelectEl = document.getElementById('sortSelect')
+const formSearchEl = document.getElementById('formSearch')
+const seeMoreBtnEl = document.getElementById('seeMoreBtn')
+const seeAllBtnEl = document.getElementById('seeAllBtn')
 // {
 //     "id": "89aed5b8c686ebd713a62873e4cd756abab7a106",
 //     "make": "BMW",
@@ -27,29 +30,58 @@ const sortSelectEl = document.getElementById('sortSelect')
 //     "odo": 394036,
 //     "consume": { "road": 4.8, "city": 12.3, "mixed": 8.4 }
 //   },
-sortSelectEl.addEventListener('change', event => { 
+seeMoreBtnEl.addEventListener('click', event => {
+  renderCards(CARS, cardListEl)
+})
+seeAllBtnEl.addEventListener('click', event => {
+  renderCards(CARS)
+})
+
+
+formSearchEl.addEventListener('submit', function (event) {
+  event.preventDefault()
+
+  const query = this.search.value.trim().toLowerCase().split(' ').filter(word => !!word)
+  const searchFields = ['make', 'model', 'year', 'engine_volume', 'fuel', 'vin']
+  const filteredCars = CARS.filter(car => {
+    return query.every(word => {
+      return searchFields.some(field => {
+        return `${car[field]}`.trim().toLowerCase().includes(word)
+      })
+    })
+  })
+
+  renderCards(filteredCars, cardListEl, true)
+})
+
+
+sortSelectEl.addEventListener('change', event => {
   console.log(event.target.value.split());
   // let type = event.target.value.split('-')[1]
   // let key = event.target.value.split('-')[0]
   let [key, type] = event.target.value.split('-')
 
-  CARS.sort((a,b) => {
-    if (type == 'ab') {
-      if (key != string) {
+  if (type == 'ab') {
+    CARS.sort((a, b) => {
+      if (typeof a[key] != 'string') {
         return a[key] - b[key]
-      } else if (key == string) {
+      } else if (typeof a[key] == 'string') {
         return (a[key]).localeCompare(b[key])
       }
-    } else if (type == 'ba') {
-      if (key != string) {
+    })
+  } else if (type == 'ba') {
+    CARS.sort((a, b) => {
+      if (typeof b[key] != 'string') {
         return b[key] - a[key]
-      } else if (key == string) {
+      } else if (typeof b[key] == 'string') {
         return (b[key]).localeCompare(a[key])
       }
-    }
-  })
-  
-  renderCards(CARS, cardListEl)
+    })
+  }
+
+
+
+  renderCards(CARS, cardListEl, true)
 })
 
 
@@ -80,10 +112,21 @@ masonryBtnsEl.addEventListener('click', event => {
 renderCards(CARS, cardListEl)
 
 
-function renderCards(data_array, node) {
+function renderCards(data_array, node, empty, full) {
+  const count = 10
+  if (empty) {
+    node.innerHTML = ''
+  }
+  const elems = node.children.length
   let html = ''
-  data_array.forEach(el => html += createCardHTML(el));
-  node.innerHTML = html
+  if (data_array.length > 0) {
+    for (let i = 0; i < count; i++) {
+      html += createCardHTML(data_array[elems + i])
+    }
+  } else {
+    html = `<h2 class="text-center text-danger">No cars :((</h2>`
+  }
+  node.insertAdjacentHTML('beforeend', html)
 }
 
 
@@ -96,24 +139,15 @@ function createCardHTML(card_data) {
       starIcons += '<i class="far fa-star"></i>'
     }
   }
-  let vinCheck = ''
-  if (card_data.vin_check == true) {
-    vinCheck = '<i class="fas fa-check text-success fs-4 px-2"></i>'
-  } else {
-    vinCheck = '<i class="fas fa-times text-danger fs-4 px-2"></i>'
-  }
-  let top = ''
-  if (card_data.top == true) {
-    
-  } else if (card_data.top == false){
-
-  }
+  let vinCheck = card_data.vin_check ? '<i class="fas fa-check text-success fs-4 px-2"></i>' : '<i class="fas fa-times text-danger fs-4 px-2"></i>'
+  let top = card_data.top ? '<div class="bg-success p-2 position-absolute text-white">Top</div>' : ''
 
   return `<div class="col card mb-3 ">
     <div class="row g-0">
       <div class="col-4 card-img-wrap position-relative">
+        ${top}
         <img class="card-img" width="1" height="1" loading="lazy" src="${card_data.img}" alt="${card_data.make} ${card_data.model}" />
-        <h6 class="text-warning my-4 d-flex justify-content-center fs-4">${starIcons}</h6>
+        <h6 class="star-icons text-warning my-4 d-flex justify-content-center fs-4">${starIcons}</h6>
       </div>
       <div class="col-8 card-body-wrap">
         <div class="card-body position-relative">
@@ -134,12 +168,12 @@ function createCardHTML(card_data) {
           </ul>
           ${card_data.vin ? `<p class="card-vin "><span class="vin-span fw-bold text-primary fs-5">VIN:</span> ${card_data.vin}${vinCheck}</p>` : '<div class="bg-warning d-flex justify-content-center fs-5  p-1 my-4">This car hasnt a VIN number!!!!!</div>'}
           <p>Color: ${card_data.color}</p>
-          <div class="call d-flex align-items-center">
-          <a href="tel:${card_data.phone}" class="btn btn-info cart-btn  text-light"><i class="fas fa-phone-alt"></i> Cart</a>
+          <div class="cart d-flex align-items-center">
+          <a class="btn btn-info cart-btn  text-light"><i class="fas fa-shopping-cart"></i> Cart</a>
           <a href="tel:${card_data.phone}" class="btn btn-primary call-btn mx-4"><i class="fas fa-phone-alt"></i> Call</a>
           <p><i class="far fa-user"></i> ${card_data.seller}</p>
           </div>
-          <button class="position-absolute top-0 end-0 btn btn-secondary m-3"><i class="fas fa-star"></i></button>
+          <button class="star-btn position-absolute top-0 end-0 btn btn-secondary m-3"><i class="fas fa-star"></i></button>
         </div>
       </div>
       <div class="col-12 card-footer text-muted">
@@ -173,8 +207,9 @@ function findSiblings(element) {
 
 
 
-// let a = [5,6,9,1,2,10,4,7,13,8,11]
-
+//  let a = [5,6,9,1,2,10,4,7,13,8,11]
+// let newA = a.filter(num => num>5)
+// console.log(newA);
 // a.sort((a,b) => {
 //   return a - b
 // })
