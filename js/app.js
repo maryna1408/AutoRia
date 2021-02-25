@@ -7,6 +7,27 @@ const sortSelectEl = document.getElementById('sortSelect')
 const formSearchEl = document.getElementById('formSearch')
 const seeMoreBtnEl = document.getElementById('seeMoreBtn')
 const seeAllBtnEl = document.getElementById('seeAllBtn')
+const seeAllBtnsEl = document.getElementById('seeAllBtns')
+const dateFormatter = new Intl.DateTimeFormat()
+const timeFormatter = new Intl.DateTimeFormat(undefined, {
+  hour: 'numeric',
+  minute: 'numeric'
+})
+const currencyFormatter = new Intl.NumberFormat(undefined, {
+  style: 'currency',
+  currency: 'USD',
+  maximumFractionDigits: 0
+})
+const currencyFormatterUAH = new Intl.NumberFormat(undefined, {
+  style: 'currency',
+  currency: 'UAH',
+  maximumFractionDigits: 0
+})
+const rateUSDtoUAH = 28.3459
+if (!localStorage.wishlist) {
+  localStorage.wishlist = JSON.stringify([])
+}
+const wishlistLS = JSON.parse(localStorage.wishlist)
 // {
 //     "id": "89aed5b8c686ebd713a62873e4cd756abab7a106",
 //     "make": "BMW",
@@ -30,28 +51,44 @@ const seeAllBtnEl = document.getElementById('seeAllBtn')
 //     "odo": 394036,
 //     "consume": { "road": 4.8, "city": 12.3, "mixed": 8.4 }
 //   },
+renderCards(CARS, cardListEl)
+
+
+cardListEl.addEventListener('click', event => {
+  const wishBtnEl = event.target.closest('.star-btn')
+  if (wishBtnEl) {
+    const carId = wishBtnEl.closest('.card').dataset.id
+    console.log('star btn click', carId);
+    const savedIdIndex = wishlistLS.indexOf(carId)
+    if (!~savedIdIndex) {
+      wishlistLS.push(carId)
+      wishBtnEl.classList.add('text-warning')
+    } else{
+      wishlistLS.splice(savedIdIndex, 1)
+      wishBtnEl.classList.remove('text-warning')
+    }
+    localStorage.wishlist = JSON.stringify(wishlistLS)
+  }
+})
+
 seeMoreBtnEl.addEventListener('click', event => {
   renderCards(CARS, cardListEl)
 })
 seeAllBtnEl.addEventListener('click', event => {
-  renderCards(CARS)
+  renderCards(CARS, cardListEl, false, true)
 })
-
-
 formSearchEl.addEventListener('submit', function (event) {
   event.preventDefault()
-
   const query = this.search.value.trim().toLowerCase().split(' ').filter(word => !!word)
   const searchFields = ['make', 'model', 'year', 'engine_volume', 'fuel', 'vin']
-  const filteredCars = CARS.filter(car => {
+  CARS = JSON.parse(DATA).filter(car => {
     return query.every(word => {
       return searchFields.some(field => {
         return `${car[field]}`.trim().toLowerCase().includes(word)
       })
     })
   })
-
-  renderCards(filteredCars, cardListEl, true)
+  renderCards(CARS, cardListEl, true)
 })
 
 
@@ -59,7 +96,7 @@ sortSelectEl.addEventListener('change', event => {
   console.log(event.target.value.split());
   // let type = event.target.value.split('-')[1]
   // let key = event.target.value.split('-')[0]
-  let [key, type] = event.target.value.split('-')
+  const [key, type] = event.target.value.split('-')
 
   if (type == 'ab') {
     CARS.sort((a, b) => {
@@ -109,19 +146,32 @@ masonryBtnsEl.addEventListener('click', event => {
 })
 
 
-renderCards(CARS, cardListEl)
 
 
-function renderCards(data_array, node, empty, full) {
-  const count = 10
-  if (empty) {
+
+function renderCards(data_array, node, clear, full) {
+  let count = 10
+  if (clear) {
     node.innerHTML = ''
   }
   const elems = node.children.length
+  if (full) {
+    count = data_array.length - elems
+  }
+  if (elems + count >= data_array.length) {
+    seeAllBtnsEl.classList.add('d-none')
+  } else{
+    seeAllBtnsEl.classList.contains('d-none') && seeAllBtnsEl.classList.remove('d-none')
+  }
   let html = ''
   if (data_array.length > 0) {
     for (let i = 0; i < count; i++) {
-      html += createCardHTML(data_array[elems + i])
+      const car = data_array[elems + i]
+      if (car) {
+        html += createCardHTML(car)
+      } else{
+        break
+      }
     }
   } else {
     html = `<h2 class="text-center text-danger">No cars :((</h2>`
@@ -142,7 +192,7 @@ function createCardHTML(card_data) {
   let vinCheck = card_data.vin_check ? '<i class="fas fa-check text-success fs-4 px-2"></i>' : '<i class="fas fa-times text-danger fs-4 px-2"></i>'
   let top = card_data.top ? '<div class="bg-success p-2 position-absolute text-white">Top</div>' : ''
 
-  return `<div class="col card mb-3 ">
+  return `<div class="col card mb-3" data-id="${card_data.id}">
     <div class="row g-0">
       <div class="col-4 card-img-wrap position-relative">
         ${top}
@@ -152,7 +202,10 @@ function createCardHTML(card_data) {
       <div class="col-8 card-body-wrap">
         <div class="card-body position-relative">
           <h5 class="card-title fs-3 fw-bold">${card_data.make} ${card_data.model} ${card_data.engine_volume} ${card_data.transmission} (${card_data.year})</h5>
-          <h6 class="card-price fs-3 fw-bold text-success">${card_data.price}$</h6>
+          <div class="price d-flex align-items-center">
+          <h6 class="card-price fs-3 fw-bold text-success me-4">${currencyFormatter.format(card_data.price)}</h6>
+          <span class="fs-5 text-secondary">${currencyFormatterUAH.format(card_data.price*rateUSDtoUAH)}</span>
+          </div>
           
           <ul class="col-8 parameters px-2">
           <li class="span-parameters py-2"><i class="fas fa-tachometer-alt text-warning"></i> ${card_data.odo} km</li>
@@ -173,11 +226,11 @@ function createCardHTML(card_data) {
           <a href="tel:${card_data.phone}" class="btn btn-primary call-btn mx-4"><i class="fas fa-phone-alt"></i> Call</a>
           <p><i class="far fa-user"></i> ${card_data.seller}</p>
           </div>
-          <button class="star-btn position-absolute top-0 end-0 btn btn-secondary m-3"><i class="fas fa-star"></i></button>
+          <button class="star-btn position-absolute top-0 end-0 btn btn-secondary m-3 ${wishlistLS.includes(card_data.id) ? 'text-warning' : ''}"><i class="fas fa-star"></i></button>
         </div>
       </div>
       <div class="col-12 card-footer text-muted">
-        <small class="text-muted"><i class="far fa-clock mx-2"></i>${card_data.timestamp}</small>
+        <small class="text-muted"><i class="far fa-clock mx-2"></i>${dateFormatter.format(card_data.timestamp)} ${timeFormatter.format(card_data.timestamp) }</small>
         <small class="text-muted"><i class="far fa-eye mx-2"></i>${card_data.views}</small>
       </div>
     </div>
@@ -214,3 +267,6 @@ function findSiblings(element) {
 //   return a - b
 // })
 // console.log(a);
+
+
+
