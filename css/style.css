@@ -14,6 +14,10 @@ ol, ul {
 /* body *{
 font-size: 18px;
 } */
+.filter-fields{
+    max-height: 300px;
+    overflow: auto;
+}
 .card-title{
     transition: .2s;
 }

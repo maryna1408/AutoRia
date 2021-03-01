@@ -55,7 +55,20 @@
             </button>
           </div>
         </div>
-        <div class="col-3 filter-bar">Filters</div>
+        <div class="col-3 filter-bar">
+          <form class="filter-form" name="filterForm" id="filterForm">
+            <!-- <fieldset>
+              <legend>Fuel</legend>
+              <input type="checkbox" value="Benzin" name="fuel">
+              <input type="checkbox" value="Diesel" name="fuel">
+              <input type="checkbox" value="Propane" name="fuel">
+            </fieldset> -->
+            <div class="form-btns mt-3">
+              <button type="submit" class="btn btn-success">Filter</button>
+              <button type="reset" class="btn btn-secondary">Reset</button>
+            </div>
+          </form>
+        </div>
         <div class="col-9 content pb-5">
           <div class="row row-cols-1 g-0 card-list position-relative" id="cardList">
             <!-- <div class="col card mb-3">

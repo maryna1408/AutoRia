@@ -1,6 +1,7 @@
 'use strict'
 
 let CARS = JSON.parse(DATA)
+
 const cardListEl = document.getElementById('cardList')
 const masonryBtnsEl = document.getElementById('masonryBtns')
 const sortSelectEl = document.getElementById('sortSelect')
@@ -8,6 +9,10 @@ const formSearchEl = document.getElementById('formSearch')
 const seeMoreBtnEl = document.getElementById('seeMoreBtn')
 const seeAllBtnEl = document.getElementById('seeAllBtn')
 const seeAllBtnsEl = document.getElementById('seeAllBtns')
+const filterFormEl = document.getElementById('filterForm')
+
+const filterFields = ['make', 'fuel', 'transmission', 'price']
+
 const dateFormatter = new Intl.DateTimeFormat()
 const timeFormatter = new Intl.DateTimeFormat(undefined, {
   hour: 'numeric',
@@ -23,7 +28,9 @@ const currencyFormatterUAH = new Intl.NumberFormat(undefined, {
   currency: 'UAH',
   maximumFractionDigits: 0
 })
+
 const rateUSDtoUAH = 28.3459
+
 if (!localStorage.wishlist) {
   localStorage.wishlist = JSON.stringify([])
 }
@@ -54,6 +61,73 @@ const wishlistLS = JSON.parse(localStorage.wishlist)
 renderCards(CARS, cardListEl)
 
 
+
+filterFormEl.addEventListener('submit', function (event) {
+  event.preventDefault()
+  const query = []
+  filterFields.forEach(field => {
+    const checkedValues = []
+    this[field].forEach(input => {
+      if (input.checked) {
+        checkedValues.push(input.value)
+      }
+    })
+    query.push(checkedValues)
+  })
+  console.log(query);
+  CARS = JSON.parse(DATA).filter(car => {
+    return query.every((values, i) => {
+      return values.length == 0 ? true : values.includes(car[filterFields[i]])
+    })
+  })
+  renderCards(CARS, cardListEl, true)
+})
+
+
+createFilterForm(CARS, filterFormEl, filterFields)
+
+function createFilterForm(cars, formEl, fields) {
+  let formHtml = ''
+  fields.forEach(field => {
+    const values = new Set(cars.map(car => car[field]))
+    formHtml += createFilterFieldset(field, values)
+  })
+  formEl.insertAdjacentHTML('afterBegin', formHtml)
+}
+
+function createFilterFieldset(field, values) {
+  let inputsHtml = ''
+  if (field == 'price') {
+
+  } else {
+    values.forEach(value => inputsHtml += createFilterCheckbox(field, value) )
+  }
+  return `
+  <fieldset class="mb-2">
+    <legend class="text-success fw-bold text-uppercase fs-3">${field}</legend>
+    <div class="filter-fields d-flex flex-column" >
+    ${inputsHtml}
+    </div>
+  </fieldset>`
+}
+
+function createFilterCheckbox(field, value) {
+  return `<label>
+  <input type="checkbox" value="${value}" name="${field}">
+  ${value}
+  </label>`
+}
+function createFilterRange(field, value) {
+  return `<lable>
+  <div><input type="text" value="${value}" name="${field}">cgg</div>
+  <input type="text" value="${value}" name="${field}">
+  </lable>`
+}
+
+
+
+
+
 cardListEl.addEventListener('click', event => {
   const wishBtnEl = event.target.closest('.star-btn')
   if (wishBtnEl) {
@@ -77,6 +151,7 @@ seeMoreBtnEl.addEventListener('click', event => {
 seeAllBtnEl.addEventListener('click', event => {
   renderCards(CARS, cardListEl, false, true)
 })
+
 formSearchEl.addEventListener('submit', function (event) {
   event.preventDefault()
   const query = this.search.value.trim().toLowerCase().split(' ').filter(word => !!word)
@@ -269,4 +344,8 @@ function findSiblings(element) {
 // console.log(a);
 
 
+// let a = [5,6,9,1,2,10,4,7,13,8,11]
 
+// let sum = a.reduce((acu, curr) => acu += curr, 0)
+
+// console.log(sum);
