@@ -29,7 +29,14 @@ const currencyFormatterUAH = new Intl.NumberFormat(undefined, {
   maximumFractionDigits: 0
 })
 
-const rateUSDtoUAH = 28.3459
+
+async function getRate(url) {
+  const response = await fetch(url)
+  console.log(response)
+  const rateUSDtoUAH = await response.json
+  console.log(rateUSDtoUAH)
+}
+
 
 if (!localStorage.wishlist) {
   localStorage.wishlist = JSON.stringify([])
@@ -279,7 +286,7 @@ function createCardHTML(card_data) {
           <h5 class="card-title fs-3 fw-bold">${card_data.make} ${card_data.model} ${card_data.engine_volume} ${card_data.transmission} (${card_data.year})</h5>
           <div class="price d-flex align-items-center">
           <h6 class="card-price fs-3 fw-bold text-success me-4">${currencyFormatter.format(card_data.price)}</h6>
-          <span class="fs-5 text-secondary">${currencyFormatterUAH.format(card_data.price*rateUSDtoUAH)}</span>
+          <span class="fs-5 text-secondary">${currencyFormatterUAH.format(card_data.price*getRate('https://api.privatbank.ua/p24api/pubinfo?json&exchange&coursid=5'))}</span>
           </div>
           
           <ul class="col-8 parameters px-2">
