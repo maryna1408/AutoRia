@@ -1,6 +1,15 @@
 'use strict'
 
-let CARS = JSON.parse(DATA)
+let CARS = []
+async function getData(url) {
+  const response = await fetch(url)
+  CARS = await response.json()
+  renderCards(CARS, cardListEl)
+}
+
+getData('./data/cars.json')
+
+
 
 const cardListEl = document.getElementById('cardList')
 const masonryBtnsEl = document.getElementById('masonryBtns')
@@ -30,12 +39,18 @@ const currencyFormatterUAH = new Intl.NumberFormat(undefined, {
 })
 
 
+let rate = []
+
 async function getRate(url) {
   const response = await fetch(url)
   console.log(response)
-  const rateUSDtoUAH = await response.json
-  console.log(rateUSDtoUAH)
+  rate = await response.json()
+  console.log(rate)
 }
+
+getRate('https://api.privatbank.ua/p24api/pubinfo?json&exchange&coursid=5')
+
+console.log(rate)
 
 
 if (!localStorage.wishlist) {
@@ -65,7 +80,6 @@ const wishlistLS = JSON.parse(localStorage.wishlist)
 //     "odo": 394036,
 //     "consume": { "road": 4.8, "city": 12.3, "mixed": 8.4 }
 //   },
-renderCards(CARS, cardListEl)
 
 
 
@@ -286,7 +300,7 @@ function createCardHTML(card_data) {
           <h5 class="card-title fs-3 fw-bold">${card_data.make} ${card_data.model} ${card_data.engine_volume} ${card_data.transmission} (${card_data.year})</h5>
           <div class="price d-flex align-items-center">
           <h6 class="card-price fs-3 fw-bold text-success me-4">${currencyFormatter.format(card_data.price)}</h6>
-          <span class="fs-5 text-secondary">${currencyFormatterUAH.format(card_data.price*getRate('https://api.privatbank.ua/p24api/pubinfo?json&exchange&coursid=5'))}</span>
+          <span class="fs-5 text-secondary">${currencyFormatterUAH.format(card_data.price)}</span>
           </div>
           
           <ul class="col-8 parameters px-2">
