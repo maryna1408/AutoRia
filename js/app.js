@@ -7,7 +7,7 @@ async function getData(url) {
   renderCards(CARS, cardListEl)
 }
 
-getData('./data/cars.json')
+getData('/data/cars.json')
 
 
 
@@ -48,9 +48,10 @@ async function getRate(url) {
   console.log(rate)
 }
 
+console.log(rate)
+
 getRate('https://api.privatbank.ua/p24api/pubinfo?json&exchange&coursid=5')
 
-console.log(rate)
 
 
 if (!localStorage.wishlist) {
@@ -300,7 +301,7 @@ function createCardHTML(card_data) {
           <h5 class="card-title fs-3 fw-bold">${card_data.make} ${card_data.model} ${card_data.engine_volume} ${card_data.transmission} (${card_data.year})</h5>
           <div class="price d-flex align-items-center">
           <h6 class="card-price fs-3 fw-bold text-success me-4">${currencyFormatter.format(card_data.price)}</h6>
-          <span class="fs-5 text-secondary">${currencyFormatterUAH.format(card_data.price)}</span>
+          <span class="fs-5 text-secondary">${currencyFormatterUAH.format(card_data.price*rate[0].buy)}</span>
           </div>
           
           <ul class="col-8 parameters px-2">
